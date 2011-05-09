@@ -5,7 +5,6 @@ enum NodeColor {RED, BLUE};
 
 class Person {
 	private String name;
-	private int id;
 	
 	private LinkedList accusees;
 	private LinkedList accusers;
@@ -13,16 +12,11 @@ class Person {
 	public boolean visited;
 	public NodeColor color;
 	
-	public Person(String name, int id) {
+	public Person(String name) {
 		this.name = name;
-		this.id = id;
 		
 		accusees = new LinkedList();
 		accusers = new LinkedList();
-	}
-	
-	public int id() {
-		return this.id;
 	}
 	
 	public String name() {
@@ -47,20 +41,25 @@ class Person {
 }
 
 /** Maintain collection of Person's. */
-class PersonList {
-    private LinkedList people;
-
-    public PersonList() {
-        people = new LinkedList();
+class PersonTable {
+    private Hashtable people;
+    private Person firstPerson;
+    
+    public PersonTable(int nPersons) {
+        people = new Hashtable(nPersons);
     }
 
     /** Add a new person to the list. If the person is already on the list, do nothing. */
     public Person addPerson(String name) {
-        Person p = findPersonByName(name);
+        Person p = (Person) people.get(name);
 
         if (p == null) {
-        	p = new Person(name, people.size());
-        	people.addFirst(p);
+        	p = new Person(name);
+        	people.put(name, p);
+        }
+    
+        if (firstPerson == null) {
+        	firstPerson = p;
         }
         
         return p;
@@ -68,26 +67,17 @@ class PersonList {
 
     /** Return the Person associated with the name */
     public Person findPersonByName(String name) {
-        ListIterator iter = people.listIterator(0);
-
-        while (iter.hasNext()) {
-            Person item = (Person) iter.next();
-            if (name.equals(item.name())) {
-                return item;
-            }
-        }
-
-        return null;
+        return (Person) people.get(name);
     }
-    
-    public Person findPersonById(int id) {
-    	return (Person) people.get(id);
-    }
+
+	public Person firstPerson() {
+		return firstPerson;
+	}
 }
 
 
 class liarliar {
-    private static PersonList personList;
+    private static PersonTable personTable;
     private static int nPersons;
     
     private static NodeColor toggleColor(NodeColor color) {
@@ -99,7 +89,8 @@ class liarliar {
     }
     
     private static void doPartition() {
-    	Person current = personList.findPersonById(0);
+    	Person current = personTable.firstPerson();
+    	
     	current.color = NodeColor.RED;
     	
     	int redTotal = 0;
@@ -151,14 +142,14 @@ class liarliar {
     }
     
     private static void readPeople(String filename) {
-        personList = new PersonList();
-
-        try {
+    	try {
             BufferedReader input = new BufferedReader(new FileReader(filename));
 
             String s = input.readLine();
             nPersons = Integer.parseInt(s);
 
+            personTable = new PersonTable(nPersons);
+            
             s = input.readLine();
             while (s != null) {
             	String[] pieces = s.split("\\s+");
@@ -166,12 +157,12 @@ class liarliar {
                 if (pieces.length == 2) {
                     // This is a line of the form "Name <n>"
                     int naccused = Integer.parseInt(pieces[1]);
-                    Person accuser = personList.addPerson(pieces[0]);
+                    Person accuser = personTable.addPerson(pieces[0]);
 
                     int i = 0;
                     for (i = 0; i < naccused; i++) {
                         s = input.readLine();
-                        Person accusee = personList.addPerson(s);
+                        Person accusee = personTable.addPerson(s);
                         
                         accuser.addAccusee(accusee);
                         accusee.addAccuser(accuser);
