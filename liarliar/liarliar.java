@@ -30,11 +30,11 @@ class Person {
 	}
 	
 	public void addAccusee(Person p) {
-		accusees.addLast(p);
+		accusees.addFirst(p);
 	}
 	
 	public void addAccuser(Person p) {
-		accusers.addLast(p);
+		accusers.addFirst(p);
 	}
 	
 	public Object[] accusees() {
@@ -60,7 +60,7 @@ class PersonList {
 
         if (p == null) {
         	p = new Person(name, people.size());
-        	people.addLast(p);
+        	people.addFirst(p);
         }
         
         return p;
@@ -127,12 +127,12 @@ class liarliar {
 
     			for (int i = 0; i < currentAccusers.length; i++) {
     				((Person)(currentAccusers[i])).color = toggleColor(current.color);
-    				toVisit.addLast(currentAccusers[i]);
+    				toVisit.addFirst(currentAccusers[i]);
     			}
 
     			for (int i = 0; i < currentAccusees.length; i++) {
     				((Person)(currentAccusees[i])).color = toggleColor(current.color);
-    				toVisit.addLast(currentAccusees[i]);
+    				toVisit.addFirst(currentAccusees[i]);
     			}
     		}
     		
