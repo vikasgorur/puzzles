@@ -6,37 +6,27 @@ enum NodeColor {RED, BLUE};
 class Person {
 	private String name;
 	
-	private LinkedList accusees;
-	private LinkedList accusers;
-	
+	private LinkedList connectedTo;
+		
 	public boolean visited;
 	public NodeColor color;
 	
 	public Person(String name) {
 		this.name = name;
 		
-		accusees = new LinkedList();
-		accusers = new LinkedList();
+		connectedTo = new LinkedList();
 	}
 	
 	public String name() {
 		return this.name;
 	}
 	
-	public void addAccusee(Person p) {
-		accusees.addFirst(p);
+	public void addConnection(Person p) {
+		connectedTo.addFirst(p);
 	}
 	
-	public void addAccuser(Person p) {
-		accusers.addFirst(p);
-	}
-	
-	public Object[] accusees() {
-		return accusees.toArray();
-	}
-	
-	public Object[] accusers() {
-		return accusers.toArray();
+	public Object[] connections() {
+		return connectedTo.toArray();
 	}
 }
 
@@ -113,17 +103,11 @@ class liarliar {
     				blueTotal++;
     			}
     			
-    			Object[] currentAccusers = current.accusers();
-    			Object[] currentAccusees = current.accusees();
-
-    			for (int i = 0; i < currentAccusers.length; i++) {
-    				((Person)(currentAccusers[i])).color = toggleColor(current.color);
-    				toVisit.addFirst(currentAccusers[i]);
-    			}
-
-    			for (int i = 0; i < currentAccusees.length; i++) {
-    				((Person)(currentAccusees[i])).color = toggleColor(current.color);
-    				toVisit.addFirst(currentAccusees[i]);
+    			Object[] currentConnections = current.connections();
+    			
+    			for (int i = 0; i < currentConnections.length; i++) {
+    				((Person)(currentConnections[i])).color = toggleColor(current.color);
+    				toVisit.addFirst(currentConnections[i]);
     			}
     		}
     		
@@ -164,8 +148,8 @@ class liarliar {
                         s = input.readLine();
                         Person accusee = personTable.addPerson(s);
                         
-                        accuser.addAccusee(accusee);
-                        accusee.addAccuser(accuser);
+                        accuser.addConnection(accusee);
+                        accusee.addConnection(accuser);
                     }
                 }
                 
