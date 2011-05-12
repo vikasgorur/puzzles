@@ -1,50 +1,95 @@
+/**
+ * (C) 2011 Vikas Gorur <vikasgp@gmail.com>
+ */
+
+/**
+ * This is a solution to the Facebook puzzle posted at:
+ * http://www.facebook.com/careers/puzzles.php?puzzle_id=20
+ * 
+ * From the problem statement, we observe two things:
+ * 	- Any two nodes that share an edge (regardless of direction) must belong to different sets.
+ * 	- If a unique solution exists, then the closure of the graph starting from any arbitrary node
+ * 	  is equal to the entire graph.
+ * 
+ * Given the above, the solution is to simply start at an arbitrary node and visit the entire
+ * graph while alternately painting the nodes "red" or "blue".
+ */
+
 import java.io.*;
 import java.util.*;
 
+/**
+ * Colors for the nodes.
+ *
+ */
 enum NodeColor {RED, BLUE};
 
+/**
+ * Represents a person and keeps a list of all its connections. 
+ *
+ */
 class Person {
-	private String name;
-	
-	private LinkedList connectedTo;
-		
+	/**
+	 * Whether this node has been visited already.
+	 */
 	public boolean visited;
+	
+	/**
+	 * Color of this node.
+	 */
 	public NodeColor color;
 	
-	public Person(String name) {
-		this.name = name;
-		
+	private LinkedList connectedTo;
+	
+	/**
+	 * Create a person.
+	 */
+	public Person() {
 		connectedTo = new LinkedList();
 	}
 	
-	public String name() {
-		return this.name;
+	/**
+	 * Add a connection to another Person.
+	 * @param person	Person to be connected to this.
+	 */
+	public void addConnection(Person person) {
+		connectedTo.addFirst(person);
 	}
 	
-	public void addConnection(Person p) {
-		connectedTo.addFirst(p);
-	}
-	
-	public Object[] connections() {
-		return connectedTo.toArray();
+	/**
+	 * All the Person's connected to this Person.
+	 * @return An iterator for the connected Persons.
+	 */
+	public ListIterator connections() {
+		return connectedTo.listIterator();
 	}
 }
 
-/** Maintain collection of Person's. */
+
+/**
+ * A table of unique Person's.
+ */
 class PersonTable {
     private Hashtable people;
     private Person firstPerson;
     
+    /**
+     * Create a new PersonTable.
+     * @param nPersons	Number of Person's expected to be in the table. This is used as a hint
+     * for the internal hash table's capacity.
+     */
     public PersonTable(int nPersons) {
         people = new Hashtable(nPersons);
     }
 
-    /** Add a new person to the list. If the person is already on the list, do nothing. */
+    /**
+     * Add a new person to the list. If the person is already on the list, do nothing. 
+     */
     public Person addPerson(String name) {
         Person p = (Person) people.get(name);
 
         if (p == null) {
-        	p = new Person(name);
+        	p = new Person();
         	people.put(name, p);
         }
     
@@ -55,21 +100,27 @@ class PersonTable {
         return p;
     }
 
-    /** Return the Person associated with the name */
-    public Person findPersonByName(String name) {
-        return (Person) people.get(name);
-    }
-
+    /**
+     * Get the first Person that was inserted.
+     */
 	public Person firstPerson() {
 		return firstPerson;
 	}
 }
 
 
+/**
+ * Main class for the program.
+ *
+ */
 class liarliar {
     private static PersonTable personTable;
     private static int nPersons;
-    
+
+    /**
+     * Return the color opposite to the given argument.
+     * @param color	RED or BLUE
+     */
     private static NodeColor toggleColor(NodeColor color) {
     	if (color == NodeColor.RED) {
     		return NodeColor.BLUE;
@@ -77,7 +128,10 @@ class liarliar {
     		return NodeColor.RED;
     	}
     }
-    
+
+    /**
+     * Find the partition by doing a depth-first walk of the graph.
+     */
     private static void doPartition() {
     	Person current = personTable.firstPerson();
     	
@@ -93,24 +147,26 @@ class liarliar {
     		// If the graph has a solution, then the closure of any arbitrary node will be
     		// equal to the entire graph
     		
-    		if (!current.visited) {
-    			current.visited = true;
-    			visitedCount++;
-    			
-    			if (current.color == NodeColor.RED) {
-    				redTotal++;
-    			} else {
-    				blueTotal++;
-    			}
-    			
-    			Object[] currentConnections = current.connections();
-    			
-    			for (int i = 0; i < currentConnections.length; i++) {
-    				((Person)(currentConnections[i])).color = toggleColor(current.color);
-    				toVisit.addFirst(currentConnections[i]);
+    		current.visited = true;
+    		visitedCount++;
+
+    		if (current.color == NodeColor.RED) {
+    			redTotal++;
+    		} else {
+    			blueTotal++;
+    		}
+
+    		ListIterator currentConnections = current.connections();
+
+    		while (currentConnections.hasNext()) {
+    			Person currentConnection = (Person) currentConnections.next();
+    			currentConnection.color = toggleColor(current.color);
+
+    			if (!currentConnection.visited) {
+    				toVisit.addFirst(currentConnection);
     			}
     		}
-    		
+
     		current = (Person) toVisit.removeFirst();
     	}
     	
@@ -125,6 +181,10 @@ class liarliar {
     	
     }
     
+    /**
+     * Read the input file and add names and associations to the PersonTable.
+     * @param filename	File to read names from.
+     */
     private static void readPeople(String filename) {
     	try {
             BufferedReader input = new BufferedReader(new FileReader(filename));
