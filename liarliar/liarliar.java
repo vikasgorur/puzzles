@@ -13,6 +13,9 @@
  * 
  * Given the above, the solution is to simply start at an arbitrary node and visit the entire
  * graph while alternately painting the nodes "red" or "blue".
+ * 
+ * PuzzleBot's final evaluation:
+ * "Your solution ran for 2261.821 ms on its longest test case."
  */
 
 import java.io.*;
