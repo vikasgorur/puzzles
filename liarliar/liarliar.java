@@ -30,9 +30,9 @@ enum NodeColor {RED, BLUE};
  */
 class Person {
 	/**
-	 * Whether this node has been visited already.
+	 * Whether this node has been added to the list of nodes to visit.
 	 */
-	public boolean visited;
+	public boolean added = false;
 	
 	/**
 	 * Color of this node.
@@ -136,19 +136,19 @@ class liarliar {
     	Person current = personTable.firstPerson();
     	
     	current.color = NodeColor.RED;
+    	current.added = true;
     	
     	int redTotal = 0;
     	int blueTotal = 0;
     	
     	LinkedList toVisit = new LinkedList();
-    	int visitedCount = 0;
+    	toVisit.addFirst(current);
     	
-    	while (visitedCount < nPersons) {
-    		// If the graph has a solution, then the closure of any arbitrary node will be
-    		// equal to the entire graph
+    	while (toVisit.size() != 0) {
+    		// The closure of any node will be the entire graph, so if toVisit is empty,
+    		// we have visited all the nodes.
     		
-    		current.visited = true;
-    		visitedCount++;
+    		current = (Person) toVisit.removeFirst();
 
     		if (current.color == NodeColor.RED) {
     			redTotal++;
@@ -162,12 +162,11 @@ class liarliar {
     			Person currentConnection = (Person) currentConnections.next();
     			currentConnection.color = toggleColor(current.color);
 
-    			if (!currentConnection.visited) {
+    			if (!currentConnection.added) {
     				toVisit.addFirst(currentConnection);
+    				currentConnection.added = true;
     			}
     		}
-
-    		current = (Person) toVisit.removeFirst();
     	}
     	
     	// According to problem statement, the first number should be the size of the
