@@ -42,13 +42,13 @@ class Person {
 	 */
 	public NodeColor color;
 	
-	private LinkedList connectedTo;
+	private LinkedList<Person> connectedTo;
 	
 	/**
 	 * Create a person.
 	 */
 	public Person() {
-		connectedTo = new LinkedList();
+		connectedTo = new LinkedList<Person>();
 	}
 	
 	/**
@@ -63,7 +63,7 @@ class Person {
 	 * All the Person's connected to this Person.
 	 * @return An iterator for the connected Persons.
 	 */
-	public ListIterator connections() {
+	public ListIterator<Person> connections() {
 		return connectedTo.listIterator();
 	}
 }
@@ -73,7 +73,7 @@ class Person {
  * A table of unique Person's.
  */
 class PersonTable {
-    private Hashtable people;
+    private Hashtable<String, Person> people;
     private Person firstPerson;
     
     /**
@@ -82,14 +82,14 @@ class PersonTable {
      * for the internal hash table's capacity.
      */
     public PersonTable(int nPersons) {
-        people = new Hashtable(nPersons);
+        people = new Hashtable<String, Person>(nPersons);
     }
 
     /**
      * Add a new person to the list. If the person is already on the list, do nothing. 
      */
     public Person addPerson(String name) {
-        Person p = (Person) people.get(name);
+        Person p = people.get(name);
 
         if (p == null) {
         	p = new Person();
@@ -144,14 +144,14 @@ class liarliar {
     	int redTotal = 0;
     	int blueTotal = 0;
     	
-    	LinkedList toVisit = new LinkedList();
+    	LinkedList<Person> toVisit = new LinkedList<Person>();
     	toVisit.addFirst(current);
     	
     	while (toVisit.size() != 0) {
     		// The closure of any node will be the entire graph, so if toVisit is empty,
     		// we have visited all the nodes.
     		
-    		current = (Person) toVisit.removeFirst();
+    		current = toVisit.removeFirst();
 
     		if (current.color == NodeColor.RED) {
     			redTotal++;
@@ -159,10 +159,10 @@ class liarliar {
     			blueTotal++;
     		}
 
-    		ListIterator currentConnections = current.connections();
+    		ListIterator<Person> currentConnections = current.connections();
 
     		while (currentConnections.hasNext()) {
-    			Person currentConnection = (Person) currentConnections.next();
+    			Person currentConnection = currentConnections.next();
     			currentConnection.color = toggleColor(current.color);
 
     			if (!currentConnection.added) {
